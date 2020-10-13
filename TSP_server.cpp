@@ -1,3 +1,4 @@
+#pragma comment(lib, "ws2_32")
 #include<iostream>
 #include<iomanip>
 #include <string>
@@ -10,15 +11,12 @@
 using namespace std;
 using std::thread;
 
-#include <opencv2/opencv.hpp>	// library for image processing
-using namespace cv;
-
 #define port 2204	// port num 2204
 
 const double pi = 3.1415926535897932384626433832795028841971693993751;
 
 double completed[10], cost = 0;
-const int user = 8;   // target point number
+const int user = 5;   // target point number
 int* course; // path array global variable
 int coursenum = 0;   // array location of course
 
@@ -32,8 +30,8 @@ int szClntAddr;
 string snddata;   // string to send Client
 
 struct TargetPt {   // struct to send (user point number, Latitude, Longitude) to Client(Pixhawk-Pi)
-	int usernum;    // 각 좌표의 번호
-	double x;   // 처음 입력되어 있는 각 지점의 좌표
+	int usernum;    // user number requesting while 3 min(target point number)
+	double x;   // x = Latitude, y = Longitude
 	double y;
 };
 
@@ -51,25 +49,28 @@ string makemsg(string snddata, struct TargetPt targetdata[user]);
 void ErrorHandling(const char* message);
 
 // prototype for thread
-void socket_serial_thread();	
+void socket_serial_thread_outdoor();	
+void socket_serial_thread_indoor();
 
 int main(int argc, char* argv[])
 {
 	thread image_thread;
 
+	cout << fixed;
+	cout.precision(6);
 	
-	TargetPt targetdata[user] = { {0, 35.134833, 129.106817}, {1, 35.134723, 129.105646 },
-	{2, 35.134277, 129.105293 }, {3, 35.134353, 129.105990 }, {4, 35.134572, 129.106477 },
-	{5, 35.134696, 129.105234 }, {6, 35.134387, 129.106875 }, {7, 35.134905, 129.106363 } };
-	// target point와 base포인트가 되는 좌표값  
+	TargetPt targetdata[user] = { {0, 35.132833, 129.106215 }, {1, 35.133118, 129.105832 }, {2, 35.133139, 129.106001 },
+{3, 35.133150, 129.106168 }, {4, 35.133168, 129.106331 } };
+
+
+	// base point and allocated target point(Drone zone) GPS point  
 
 	int i, j;
-
 	for (i = 0; i < user; i++) {
 		cout << "Target[" << i+1 << "] : (" << targetdata[i].x << ", " << targetdata[i].y << ")\n";
 	}
 
-	double dist[user][user];      // 받아온 좌표값들간 거리 계산 결과 저장 변수
+	double dist[user][user];	// To save distance calculating result from Android Client
 
 	for (i = 0; i < user; i++) {      // make 2d array by using calculateDistance
 		for (j = 0; j < user; j++) {
@@ -83,7 +84,7 @@ int main(int argc, char* argv[])
 
 	course = new int[user + 1];      // course dynamic allocation
 
-	// TSP 알고리즘
+	// TSP algorithm start
 	takeInput(user, dist);
 
 	cout << "\n\nThe Path is:\n";
@@ -95,9 +96,13 @@ int main(int argc, char* argv[])
 
 	cout << "\nMessage : " << snddata << "\n";      // test
 
-	thread t1(socket_serial_thread);		// thread
+	thread t1(socket_serial_thread_outdoor);		// thread 1 for outdoor
 
 	t1.join();	// wait until thread is finished
+
+	//thread t2(socket_serial_thread_indoor);		// thread 2 for indoor
+
+	//t2.join();	// wait until thread is finished
 	
 	return 0;
 }
@@ -116,7 +121,7 @@ double calculateDistance(double lat1, double long1, double lat2, double long2) {
 	return dist;
 }
 
-void takeInput(int points, double cordinates[user][user])      // points=포인트 수, cordinates는 좌표를 이용한 TSP 2차원 배열
+void takeInput(int points, double cordinates[user][user])      // points : service requesting user number, cordinates : TSP 2dimension array by using point
 {
 	int i, j;
 	int n = points;
@@ -215,14 +220,14 @@ void ErrorHandling(const char* message)
 	exit(1);
 }
 
-void socket_serial_thread() {
+void socket_serial_thread_outdoor() {
 
-	// To connect Ground pannel by USB Serial port
+	/* To connect Ground pannel by USB Serial port
 	printf("\n\nWaiting Pannel\n\n");
-	Serial* SP = new Serial("\\\\.\\COM3");
+	Serial* SP = new Serial("\\\\.\\COM10");
 	if (SP->IsConnected())
 		cout << "Visiting Pannel connected\n\n";
-	else cout << "Connect Failed\n\n";
+	else cout << "Connect Failed\n\n";*/
 
 
 	const char* msg = snddata.c_str();      // convert snddata to char type message
@@ -245,11 +250,11 @@ void socket_serial_thread() {
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);  // using current PC IP address
 	servAddr.sin_port = htons(port);        // port number 2204
 
-	// 주소 지정
+	// bind
 	if (::bind(hServSock, (SOCKADDR*)& servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 		ErrorHandling("bind() error!");
 
-	// 접속 받을수 있게 함
+	// wait client
 	if (listen(hServSock, 5) == SOCKET_ERROR)    // wating for connection during 5sec
 		ErrorHandling("listen() error!");
 
@@ -268,7 +273,8 @@ void socket_serial_thread() {
 
 	cout << "Send Message : " << msg << "\n\n";
 
-	// get visiting target number information from Client
+	/* 
+	//get visiting target number information from Client
 	cout << "Message Receives ...\n";
 	while (1) {
 
@@ -279,9 +285,10 @@ void socket_serial_thread() {
 			break;
 		}
 		else cout << "Current Drone Point : " << point << "\n";	// about Arduino
-		// 아두이노 지상 패널과 시리얼 통신 및 점등 코드 삽입
+		// send current Drone visiting point number to arduino
 		SP->WriteData(point, 1);
 	}
+	*/
 
 	cout << "\nDrone Mission Complete\n";
 	closesocket(hClntSock);
@@ -289,4 +296,54 @@ void socket_serial_thread() {
 	WSACleanup();
 	// end of Socket connection
 	cout << "\nDisconnect!! Bye~!\n";
+}
+
+void socket_serial_thread_indoor() {
+
+	const char* msg = snddata.c_str();      // convert snddata to char type message
+	char point[BUFSIZ] = "\0";		// message(visiting point or return back to base point(arrive)) from Client(Pixhawk-Pi)
+
+	// Windows Socket initialization, before using Socket it should be initialized
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+		ErrorHandling("WSAStartup() error!");
+
+	// make TCP Socket
+	hServSock = socket(PF_INET, SOCK_STREAM, 0);
+
+	if (hServSock == INVALID_SOCKET)
+		ErrorHandling("socket() error!");
+
+	// information about Socket
+	memset(&servAddr, 0, sizeof(servAddr));
+
+	servAddr.sin_family = AF_INET;
+	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);  // using current PC IP address
+	servAddr.sin_port = htons(port);        // port number 2204
+
+	// bind
+	if (::bind(hServSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
+		ErrorHandling("bind() error!");
+
+	// wait client
+	if (listen(hServSock, 5) == SOCKET_ERROR)    // wating for connection during 5sec
+		ErrorHandling("listen() error!");
+
+	cout << "\n\nWaiting Client...\n";
+
+	// Connection accept
+	szClntAddr = sizeof(clntAddr);
+	hClntSock = accept(hServSock, (SOCKADDR*)&clntAddr, &szClntAddr);   // communication with Client
+
+	if (hClntSock == INVALID_SOCKET)
+		ErrorHandling("accept() error!");
+
+	cout << "\nConecct Successfully!!\n";
+
+	send(hClntSock, msg, BUFSIZ, 0);
+
+	cout << "Send Message : " << msg << "\n\n";
+	closesocket(hClntSock);
+	closesocket(hServSock);
+	WSACleanup();
+	cout << "Disconnect\n";
 }
