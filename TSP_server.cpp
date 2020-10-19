@@ -273,7 +273,7 @@ void socket_serial_thread_outdoor() {
 
 	cout << "Send Message : " << msg << "\n\n";
 
-	/* 
+	
 	//get visiting target number information from Client
 	cout << "Message Receives ...\n";
 	while (1) {
@@ -284,11 +284,11 @@ void socket_serial_thread_outdoor() {
 			printf("Close Clinet Connection..\n");
 			break;
 		}
-		else cout << "Current Drone Point : " << point << "\n";	// about Arduino
+		else cout << "Message from Drone : " << point << "\n";	// about Arduino
 		// send current Drone visiting point number to arduino
-		SP->WriteData(point, 1);
+		//SP->WriteData(point, 1);
 	}
-	*/
+	
 
 	cout << "\nDrone Mission Complete\n";
 	closesocket(hClntSock);
