@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 import time
 
+faceCascade = cv2.CascadeClassifier('C:\opencv\sources\data\haarcascades\haarcascade_frontalface_default.xml')
+logdata = 'empty'
 
 # function to return received buffer from socket
 def recvall(sock, count):
@@ -27,7 +29,22 @@ def recv_video_from_Drone(sock):     # get Drone cam image from Drone, and send 
 
         # data를 디코딩한다.
         frame = cv2.imdecode(data, cv2.IMREAD_COLOR)
-        cv2.imshow('z', frame)
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+            flags=cv2.CASCADE_SCALE_IMAGE
+        )
+
+        # Draw a rectangle around the faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        cv2.imshow('Drone Cam', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
