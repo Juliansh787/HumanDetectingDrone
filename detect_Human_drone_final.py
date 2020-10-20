@@ -10,9 +10,6 @@ import numpy
 import threading
 from socket import *
 import RPi.GPIO as GPIO     # RaspberryPi lib
-import sys
-
-faceCascade = cv2.CascadeClassifier('C:\opencv\sources\data\haarcascades\haarcascade_frontalface_default.xml')
 
 client_index = 6  # the number of client. Add 1 to use path information(for Home base and to return)
 
@@ -109,7 +106,7 @@ def arm_and_takeoff(aTargetAltitude):
     msgTo_server("Basic pre-arm checks")
     # Don't try to arm until autopilot is ready
     while not vehicle.is_armable:
-        print(" Waiting for vehicle to initialise...")
+        msgTo_server(" Waiting for vehicle to initialise...")
         time.sleep(1)
 
     msgTo_server("Arming motors")
@@ -126,7 +123,7 @@ def arm_and_takeoff(aTargetAltitude):
     vehicle.simple_takeoff(aTargetAltitude)  # Take off to target altitude
 
     while True:
-        msgTo_server(" Altitude: ", vehicle.location.global_relative_frame.alt)
+        print(" Altitude: ", vehicle.location.global_relative_frame.alt)
         # Break and return from function just below target altitude.
         if vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95:
             msgTo_server("Reached target altitude")
@@ -282,29 +279,17 @@ def send_img_Toserver(sock):
 
             font = cv2.FONT_HERSHEY_SIMPLEX
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            faces = faceCascade.detectMultiScale(
-                gray,
-                scaleFactor=1.1,
-                minNeighbors=5,
-                minSize=(30, 30),
-                flags=cv2.CASCADE_SCALE_IMAGE
-            )
+            cv2.putText(frame,
+                        "Latitude : " + str(clat) + "\nLongitude : " + str(clong),
+                        (50, 50),
+                        font, 1,
+                        (0, 255, 255),
+                        2,
+                        cv2.LINE_4)
 
-            # Draw a rectangle around the faces
-            for (x, y, w, h) in faces:
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-                cv2.putText(frame,
-                            "Latitude : " + str(clat) + "\nLongitude : " + str(clong),
-                            (50, 50),
-                            font, 1,
-                            (0, 255, 255),
-                            2,
-                            cv2.LINE_4)
-
-                # cv2. imencode(ext, img [, params])
+            # cv2. imencode(ext, img [, params])
             # encode_param의 형식으로 frame을 jpg로 이미지를 인코딩한다.
             result, frame = cv2.imencode('.jpg', frame, encode_param)
             # frame을 String 형태로 변환
