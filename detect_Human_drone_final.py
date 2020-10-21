@@ -389,7 +389,7 @@ if __name__=="__main__":
 
     ## HPC Image processing Server(Image)
     # send drone cam image to HPC image processing server and get landing data from HPC server
-    IMG_SERVER_IP = "192.168.0.6"   # Koren VM Image Processing server IP
+    IMG_SERVER_IP = "192.168.1.221"   # Koren VM Image Processing server IP
     IMG_SERVER_PORT = 22044    # HPC external port 22044(10011)
     img_Client_socket = socket(AF_INET, SOCK_STREAM)
     img_Client_socket.connect((IMG_SERVER_IP, IMG_SERVER_PORT))
@@ -398,7 +398,7 @@ if __name__=="__main__":
     try:
         ## Web Server(Log)
         # send drone log(altitude, arrive point point etc..) to Web server
-        Web_SERVER_IP = "192.168.0.6"  # koren SDI VM IP
+        Web_SERVER_IP = "192.168.1.221"  # koren SDI VM IP
         Web_SERVER_PORT = 22045
         log_Client_socket = socket(AF_INET, SOCK_STREAM)
         log_Client_socket.connect((Web_SERVER_IP, Web_SERVER_PORT))
