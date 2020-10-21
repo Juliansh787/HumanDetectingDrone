@@ -375,7 +375,7 @@ if __name__=="__main__":
 
     # socket connection address and port for Koren VM TSP server
     # get shortest path data from Koren VM TSP server
-    TSP_SERVER_IP = "192.168.0.6"  # Koren VM TSP server IP
+    TSP_SERVER_IP = "192.168.1.221"  # Koren VM TSP server IP
     TSP_SERVER_PORT = 2204
     SIZE = 512
     tsp_client_socket = socket(AF_INET, SOCK_STREAM)
