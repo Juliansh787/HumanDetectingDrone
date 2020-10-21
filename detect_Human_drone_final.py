@@ -282,11 +282,11 @@ def send_img_Toserver(sock):
             #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             cv2.putText(frame,
-                        "Latitude : " + str(clat) + "\nLongitude : " + str(clong),
+                        "Latitude : " + str(clat) + ", Longitude : " + str(clong),
                         (50, 50),
-                        font, 1,
+                        font, 0.5,
                         (0, 255, 255),
-                        2,
+                        1,
                         cv2.LINE_4)
 
             # cv2. imencode(ext, img [, params])
