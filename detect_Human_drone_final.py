@@ -126,7 +126,7 @@ def arm_and_takeoff(aTargetAltitude):
         print(" Altitude: ", vehicle.location.global_relative_frame.alt)
         # Break and return from function just below target altitude.
         if vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95:
-            msgTo_server("Reached target altitude")
+            print("Reached target altitude")
             break
         time.sleep(1)
 def send_attitude_target(roll_angle=0.0, pitch_angle=0.0,
@@ -200,9 +200,9 @@ def drone_fly(lati, longi):
 
         starttime=time.time()
         flytime=0
-        while flytime <= 40:
+        while flytime <= 15:
 
-            if 120 <= dist <= 300:  # 3M from obstacle
+            if 290 <= dist <= 300:  # 3M from obstacle
                 msgTo_server("(Go)Detect Obstacle")
 
                 i = i + 1
@@ -226,7 +226,7 @@ def drone_fly(lati, longi):
                 time.sleep(1)
 
             dist = distance()
-            if 120 <= dist <= 300:
+            if 290 <= dist <= 300:
                 msgTo_server("(Go)Vehicle from Obstacle : " + str(dist))
             flytime = time.time() - starttime
             # For a complete implementation of follow me you'd want adjust this delay
