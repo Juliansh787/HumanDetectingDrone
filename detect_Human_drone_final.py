@@ -34,7 +34,7 @@ print("Vehicle Connect")
 
 
 # get TSP path from TSP HCP server
-## not thread
+# not thread
 def get_TSP_path():
     global locationsTo_Web
     #   To get shortest visiting path by using HPC TSP algorithm and point
@@ -189,10 +189,10 @@ def drone_fly(lati, longi):
         msgTo_server("(Go)Take off!")
         arm_and_takeoff(2)  # take off altitude 2M
 
-        i = 4  # start altitude to move 4M
+        i = 3  # start altitude to move 4M
 
         msgTo_server("(Go)Set default/target airspeed to 3")
-        vehicle.airspeed = 2
+        vehicle.airspeed = 1
 
         msgTo_server("(Go)Angle Positioning and move toward")  # move to next point
 
@@ -200,9 +200,9 @@ def drone_fly(lati, longi):
 
         starttime=time.time()
         flytime=0
-        while flytime <= 15:
+        while flytime <= 30:
 
-            if 290 <= dist <= 300:  # 3M from obstacle
+            if 150 <= dist <= 300:  # 3M from obstacle
                 msgTo_server("(Go)Detect Obstacle")
 
                 i = i + 1
@@ -220,13 +220,13 @@ def drone_fly(lati, longi):
             else:
                 msgTo_server("(Go)Go Forward")
                 loc_point = LocationGlobalRelative(lati, longi, i)
-                vehicle.simple_goto(loc_point, groundspeed=2)
+                vehicle.simple_goto(loc_point, groundspeed=1)
                 clat = vehicle.location.global_relative_frame.lat
                 clong = vehicle.location.global_relative_frame.lon
                 time.sleep(1)
 
             dist = distance()
-            if 290 <= dist <= 300:
+            if 150 <= dist <= 300:
                 msgTo_server("(Go)Vehicle from Obstacle : " + str(dist))
             flytime = time.time() - starttime
             # For a complete implementation of follow me you'd want adjust this delay
@@ -308,6 +308,8 @@ def send_img_Toserver(sock):
         img_Client_socket.close()
 
 def msgTo_server(msg_to_web):  # make message to HPC image processing server
+    global vehicle
+    msg_to_web = msg_to_web + ", Lat : " + str(clat) + ", Lng : " + str(clong)
     log_Client_socket.sendall(str(msg_to_web).encode("utf-8"))
     print(str(msg_to_web))
 
@@ -423,22 +425,26 @@ if __name__=="__main__":
         except Exception as e:  # when socket connection failed
             print(e)
             print("EMERGENCY LAND!!")
+            vehicle.mode = VehicleMode("LAND")
             time.sleep(1)
             print("Close vehicle object")
             img_Client_socket.close()
         except KeyboardInterrupt:
             msgTo_server("EMERGENCY LAND!!")
+            vehicle.mode = VehicleMode("LAND")
             time.sleep(1)
             msgTo_server("Close vehicle object")
             img_Client_socket.close()
     except Exception as e:  # when socket connection failed
         print(e)
         print("EMERGENCY LAND!!")
+        vehicle.mode = VehicleMode("LAND")
         time.sleep(1)
         print("Close vehicle object")
         log_Client_socket.close()
     except KeyboardInterrupt:
         msgTo_server("EMERGENCY LAND!!")
+        vehicle.mode = VehicleMode("LAND")
         time.sleep(1)
         msgTo_server("Close vehicle object")
         log_Client_socket.close()
