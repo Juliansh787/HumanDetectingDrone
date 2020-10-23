@@ -59,11 +59,11 @@ int main(int argc, char* argv[])
 	cout << fixed;
 	cout.precision(6);
 	
-	TargetPt targetdata[user] = { {0, 35.132833, 129.106215 }, {1, 35.133118, 129.105832 }, {2, 35.133139, 129.106001 },
-{3, 35.133150, 129.106168 }, {4, 35.133168, 129.106331 } };
+	TargetPt targetdata[user] = { {0, 35.132833, 129.106215 }, {1, 35.133168, 129.106331 },
+		{2, 35.132965, 129.105877 }, {3, 35.132985, 129.106512 }, {4, 35.132994, 129.106182 } };
+	// 0, 4, 6, 10, 8
 
-
-	// base point and allocated target point(Drone zone) GPS point  
+	// base point and allocated target point(Drone zone) GPS point
 
 	int i, j;
 	for (i = 0; i < user; i++) {
