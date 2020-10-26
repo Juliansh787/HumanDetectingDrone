@@ -213,6 +213,8 @@ def drone_fly(lati, longi):
                     send_attitude_target(roll_angle=0.0, pitch_angle=0.0,
                                          yaw_angle=None, yaw_rate=0.0, use_yaw_rate=False,
                                          thrust=0.6)
+                    clat = vehicle.location.global_relative_frame.lat
+                    clong = vehicle.location.global_relative_frame.lon
                     if vehicle.location.global_relative_frame.alt >= i * 0.95:
                         msgTo_server("(Go)Reached target altitude")
                         break
@@ -225,9 +227,9 @@ def drone_fly(lati, longi):
                 clong = vehicle.location.global_relative_frame.lon
                 time.sleep(1)
 
-            dist = distance()
-            if 150 <= dist <= 300:
-                msgTo_server("(Go)Vehicle from Obstacle : " + str(dist))
+            # dist = distance()
+            # if 150 <= dist <= 300:
+            #     msgTo_server("(Go)Vehicle from Obstacle : " + str(dist))
             flytime = time.time() - starttime
             # For a complete implementation of follow me you'd want adjust this delay
 
@@ -329,8 +331,8 @@ def send_log_Toserver(sock):
 
         msgTo_server("Start to move")  # convert num to string type     send 1 to server
 
-        # 1  start Drone delivery.    The number of point(including Home base) : 12
-        while num < client_index:  # loop 12 times, manipulate it when you test this system
+        # 1  start Drone delivery.    The number of point(including Home base) : 6
+        while num < client_index:  # loop 6 times, manipulate it when you test this system
             num = num + 1     # to move first(1) point
             drone_fly(latitude[num], longitude[num])
             point = str(latitude[num]) + '/' + str(longitude[num])
