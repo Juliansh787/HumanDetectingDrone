@@ -434,7 +434,9 @@ if __name__=="__main__":
             GPIO.cleanup()
             img_Client_socket.close()
         except KeyboardInterrupt:
-            msgTo_server("EMERGENCY LAND!!")
+            msgTo_server("EMERGENCY Return!!")
+            loc_point = LocationGlobalRelative(latitude[0], longitude[0], 3)
+            vehicle.simple_goto(loc_point, groundspeed=1)
             vehicle.mode = VehicleMode("LAND")
             time.sleep(1)
             msgTo_server("Close vehicle object")
@@ -449,7 +451,9 @@ if __name__=="__main__":
         GPIO.cleanup()
         log_Client_socket.close()
     except KeyboardInterrupt:
-        msgTo_server("EMERGENCY LAND!!")
+        msgTo_server("EMERGENCY Return!!")
+        loc_point = LocationGlobalRelative(latitude[0], longitude[0], 3)
+        vehicle.simple_goto(loc_point, groundspeed=1)
         vehicle.mode = VehicleMode("LAND")
         time.sleep(1)
         msgTo_server("Close vehicle object")
