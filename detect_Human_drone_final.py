@@ -430,12 +430,14 @@ if __name__=="__main__":
             vehicle.mode = VehicleMode("LAND")
             time.sleep(1)
             print("Close vehicle object")
+            GPIO.cleanup()
             img_Client_socket.close()
         except KeyboardInterrupt:
             msgTo_server("EMERGENCY LAND!!")
             vehicle.mode = VehicleMode("LAND")
             time.sleep(1)
             msgTo_server("Close vehicle object")
+            GPIO.cleanup()
             img_Client_socket.close()
     except Exception as e:  # when socket connection failed
         print(e)
@@ -443,10 +445,12 @@ if __name__=="__main__":
         vehicle.mode = VehicleMode("LAND")
         time.sleep(1)
         print("Close vehicle object")
+        GPIO.cleanup()
         log_Client_socket.close()
     except KeyboardInterrupt:
         msgTo_server("EMERGENCY LAND!!")
         vehicle.mode = VehicleMode("LAND")
         time.sleep(1)
         msgTo_server("Close vehicle object")
+        GPIO.cleanup()
         log_Client_socket.close()
