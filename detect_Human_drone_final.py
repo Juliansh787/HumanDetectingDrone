@@ -347,7 +347,7 @@ def send_log_Toserver(sock):
                 msgTo_server("Return To Base")
 
         # 2(Finish Drone delivery)
-        msgTo_server("Completed to Delivery")
+        msgTo_server("Complete!")
         msgTo_server("Finish")
 
         msgTo_server("arrive")
