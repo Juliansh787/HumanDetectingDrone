@@ -345,9 +345,10 @@ def send_log_Toserver(sock):
                 msgTo_server("Vehicle Reconnect!")
             elif num == client_index - 1:
                 msgTo_server("Return To Base")
+                GPIO.cleanup()
 
         # 2(Finish Drone delivery)
-        msgTo_server("Complete!")
+        msgTo_server("Mission Complete!")
         msgTo_server("Finish")
 
         msgTo_server("arrive")
