@@ -228,8 +228,8 @@ def drone_fly(lati, longi):
                 time.sleep(1)
 
             dist = distance()
-            if 150 <= dist <= 400:
-                msgTo_server("(Go)Vehicle to Obstacle : " + str(dist))
+            # if 150 <= dist <= 400:
+            msgTo_server("(Go)Vehicle to Obstacle : " + str(dist))
             flytime = time.time() - starttime
             # For a complete implementation of follow me you'd want adjust this delay
 
@@ -436,7 +436,8 @@ if __name__=="__main__":
         except KeyboardInterrupt:
             msgTo_server("EMERGENCY Return!!")
             loc_point = LocationGlobalRelative(latitude[0], longitude[0], 3)
-            vehicle.simple_goto(loc_point, groundspeed=1)
+            vehicle.simple_goto(loc_point, groundspeed=3)
+            time.sleep(10)
             vehicle.mode = VehicleMode("LAND")
             time.sleep(1)
             msgTo_server("Close vehicle object")
@@ -453,7 +454,8 @@ if __name__=="__main__":
     except KeyboardInterrupt:
         msgTo_server("EMERGENCY Return!!")
         loc_point = LocationGlobalRelative(latitude[0], longitude[0], 3)
-        vehicle.simple_goto(loc_point, groundspeed=1)
+        vehicle.simple_goto(loc_point, groundspeed=3)
+        time.sleep(10)
         vehicle.mode = VehicleMode("LAND")
         time.sleep(1)
         msgTo_server("Close vehicle object")
