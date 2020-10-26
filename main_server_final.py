@@ -71,7 +71,7 @@ if __name__=="__main__":
 
     try:
         # Image Server
-        ImgServer = "192.168.0.6"
+        ImgServer = "192.168.1.221"
         ImgServer_PORT = 22044
         serverSocket = socket(AF_INET, SOCK_STREAM)
         serverSocket.bind((ImgServer,ImgServer_PORT))
@@ -82,7 +82,7 @@ if __name__=="__main__":
 
         try:
             # Log server
-            ImgServer = "192.168.0.6"
+            ImgServer = "192.168.1.221"
             ImgServer_PORT2 = 22045
             serverSocket2 = socket(AF_INET, SOCK_STREAM)
             serverSocket2.bind((ImgServer, ImgServer_PORT2))
